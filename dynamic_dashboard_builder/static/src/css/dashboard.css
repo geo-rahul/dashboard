@@ -1,0 +1,417 @@
+/* === Secondary Toolbar Container === */
+.dashboard-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #F0F4F8;       /* soft light background */
+  border-bottom: 1px solid #DDE3EA; /* subtle dividing line */
+  height: 3rem;                     /* fixed height for consistency */
+  padding: 0 1rem;                  /* horizontal padding */
+}
+
+/* === LEFT GROUP (Template switcher, if any) === */
+.dashboard-secondary .group-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* ——— Widen the dashboard dropdown ——— */
+.dashboard-secondary .group-left .select-dashboard {
+  min-width: 250px;       /* increase from 200px */
+  max-width: 350px;       /* prevent it from growing too large */
+}
+
+.select-dashboard {
+  /* remove native styling & add custom arrow */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: #ffffff
+    url("data:image/svg+xml,%3Csvg width='12' height='7' viewBox='0 0 12 7' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none'/%3E%3C/svg%3E")
+    no-repeat right 0.75rem center;
+  background-size: 0.65rem;
+  border: 1px solid #cbd5e0;      /* soft gray */
+  border-radius: 1.5rem;          /* pill shape */
+  padding: 0.5rem 1.5rem 0.5rem 0.75rem;
+  font-size: 1rem;
+  color: #2d3748;                 /* charcoal text */
+  line-height: 1;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  min-width: 200px;
+  max-width: 350px;
+  cursor: pointer;
+}
+
+/* focus state */
+.select-dashboard:focus {
+  outline: none;
+  border-color: #3182ce;         /* Odoo blue */
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.3);
+}
+
+/* hover state */
+.select-dashboard:hover {
+  border-color: #a0aec0;
+}
+
+/* disable text wrapping */
+.select-dashboard option {
+  white-space: nowrap;
+}
+
+/* ——— “New Dashboard” button tweaks ——— */
+/* Prevent wrapping, center contents, and restyle the “+ New Dashboard” button */
+.dashboard-secondary .group-left .btn-new-dashboard {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;         /* keep label on a single line */
+  height: 2.25rem;             /* match your other toolbar buttons */
+  padding: 0 1rem;             /* horizontal padding for breathing room */
+  background-color: #805AD5;   /* purple accent */
+  color: #FFFFFF;
+  font-weight: 500;
+  border: none;
+  border-radius: 0.5rem;
+  transition: background-color .15s;
+}
+.dashboard-secondary .group-left .btn-new-dashboard:hover {
+  background-color: #6B46C1;   /* darker purple on hover */
+}
+
+/* === ICON BUTTONS === */
+.dashboard-secondary .group-center {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.dashboard-secondary .group-center .icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  background-color: #FFFFFF;
+  border: 1px solid #DDE3EA;
+  border-radius: 0.5rem;
+  color: #556574;              /* muted slate color for icons */
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color .15s, border-color .15s;
+}
+.dashboard-secondary .group-center .icon-btn:hover {
+  background-color: #E1E8F0;
+  border-color: #C4CDD5;
+}
+
+/* === FILTERS GROUP === */
+.dashboard-secondary .group-right-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.dashboard-secondary .group-right-filters select,
+.dashboard-secondary .group-right-filters .btn-filter {
+  height: 2.25rem;
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  border: 1px solid #DDE3EA;
+  border-radius: 0.5rem;
+  background-color: #FFFFFF;
+  transition: background-color .15s, border-color .15s;
+}
+.dashboard-secondary .group-right-filters select:hover,
+.dashboard-secondary .group-right-filters .btn-filter:hover {
+  background-color: #E1E8F0;
+  border-color: #C4CDD5;
+}
+
+/* === CREATE NEW CHART BUTTON === */
+.dashboard-secondary .group-right-action .btn-create-chart {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 2.5rem;
+  padding: 0 1rem;
+  background-color: #4C9AFF;   /* bold primary blue */
+  color: #FFFFFF;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color .15s;
+}
+.dashboard-secondary .group-right-action .btn-create-chart:hover {
+  background-color: #3A7DD6;
+}
+
+/* === UTILITY: ensure selects fit === */
+.dashboard-secondary select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='%23556574' stroke-width='1' fill='none' d='M1 1l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 0.5rem auto;
+}
+
+.dashboard-modal-container {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+}
+
+.dashboard-modal-container .modal-backdrop {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 1000;
+  pointer-events: auto;
+}
+
+.dashboard-modal-container .modal-dialog {
+  position: absolute;
+  overflow: visible !important;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  z-index: 1000;
+  pointer-events: auto;
+  width: 1000px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-modal-container .modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dashboard-modal-container .modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(90deg, #6f42c1 0%, #7952b3 100%);
+  color: #fff;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+.dashboard-modal-container .modal-header h3 { margin: 0; font-size: 1.25rem; }
+.dashboard-modal-container .modal-close { background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.25rem;
+  padding: 0.25rem;
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+}
+.dashboard-modal-container .modal-close:hover{
+  color: #ffdddd;
+  transform: rotate(90deg);
+}
+
+.dashboard-modal-container .modal-body {
+  padding: 1rem;
+}
+.dashboard-modal-container .modal-row {
+  display: flex; flex-direction: column; margin-bottom: 0.75rem;
+}
+.dashboard-modal-container .modal-row label {
+  font-size: 0.875rem; margin-bottom: 0.25rem; font-weight: 500;
+}
+.dashboard-modal-container .modal-row input[type="text"],
+.dashboard-modal-container .modal-row input[type="number"],
+.dashboard-modal-container .modal-row select {
+  padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;
+  font-size: 0.875rem;
+}
+.dashboard-modal-container .modal-footer {
+  display: flex; justify-content: flex-end; gap: 0.5rem;
+  padding: 0.75rem 1rem; border-top: 1px solid #eee;
+  z-index: 900;
+}
+.dashboard-modal-container .modal-footer .btn { padding: 0.5rem 1rem; font-size: 0.875rem; }
+
+/* Two-column grid for modal body */
+.dashboard-modal-container .modal-body.two-column {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.5rem;
+}
+
+/* Make each row just stack label + control */
+.dashboard-modal-container .modal-body.two-column .modal-row {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Full-width rows span both columns */
+.dashboard-modal-container .modal-body.two-column .modal-row.full-span {
+  grid-column: 1 / -1;
+}
+
+/* Ensure inputs & selects fill their cell */
+.dashboard-modal-container .modal-body.two-column input[type="text"],
+.dashboard-modal-container .modal-body.two-column select {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Multiselect styles */
+.dashboard-modal-container .group-multiselect-wrapper {
+  position: relative;
+  min-width: 150px;
+  width: 100%;
+}
+
+.dashboard-modal-container .gm-input {
+  min-height: 38px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  background: #fff;
+}
+.dashboard-modal-container .gm-placeholder {
+  color: #aaa;
+  font-size: 0.92em;
+}
+.dashboard-modal-container .gm-tag {
+  background: #eee;
+  border-radius: 2px;
+  padding: 2px 6px;
+  margin: 2px 4px 2px 0;
+  font-size: 0.9em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.dashboard-modal-container .gm-tag-remove {
+  cursor: pointer;
+  font-size: 0.95em;
+  margin-left: 4px;
+}
+.dashboard-modal-container .gm-caret {
+  margin-left: auto;
+  color: #666;
+}
+.dashboard-modal-container .gm-dropdown {
+  position: absolute;
+  z-index: 1100 !important;
+  top: 100%;
+  left: 0;
+  z-index: 2;
+  background: white;
+  border: 1px solid #bbb;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+}
+.dashboard-modal-container .gm-checkbox-item {
+  display: flex;
+  align-items: center;
+  padding: 2px 12px;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.96em;
+}
+.dashboard-modal-container .gm-checkbox-item input[type="checkbox"] {
+  margin-right: 6px;
+}
+
+.group-multiselect-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* The input area */
+.gm-input {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .25rem;
+  min-height: 2.5em;
+  padding: .5em;
+  border: 1px solid #CBD5E0;
+  border-radius: 4px;
+  background: #FFF;
+  cursor: pointer;
+}
+.gm-placeholder { color: #A0AEC0; }
+.gm-caret { margin-left: auto; color: #A0AEC0; }
+
+/* Tag chips */
+.gm-tag {
+  display: inline-flex;
+  align-items: center;
+  background: #E2E8F0;
+  padding: .25em .5em;
+  border-radius: 9999px;
+  font-size: .875em;
+}
+.gm-tag-remove {
+  margin-left: .25em;
+  cursor: pointer;
+}
+
+/* Dropdown panel */
+.gm-dropdown {
+  position: absolute;
+  overflow: visible;
+  top: calc(100% + .25rem);
+  left: 0; right: 0;
+  max-height: 260px;
+  overflow: hidden;
+  border: 1px solid #CBD5E0;
+  border-radius: 4px;
+  background: #FFF;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 3000 !important;  /* above modal footer */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Search row */
+.gm-search-row {
+  padding: .5em;
+  border-bottom: 1px solid #E2E8F0;
+}
+.gm-search {
+  width: 100%;
+  padding: .5em;
+  border: 1px solid #CBD5E0;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+/* List of items */
+.gm-list {
+  overflow-y: auto;
+  flex: 1;
+}
+.gm-item {
+  padding: .5em .75em;
+  cursor: pointer;
+}
+.gm-item:hover { background: #F7FAFC; }
+.gm-item.selected {
+  background: #3182CE;
+  color: #FFF;
+}

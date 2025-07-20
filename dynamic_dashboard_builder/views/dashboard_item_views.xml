@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_dashboard_item_tree" model="ir.ui.view">
+        <field name="name">dashboard.item.tree</field>
+        <field name="model">dashboard.item</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="item_type"/>
+                <field name="model_id"/>
+                <field name="dashboard_id"/>
+                <field name="limit_value"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_dashboard_item_form" model="ir.ui.view">
+        <field name="name">dashboard.item.form</field>
+        <field name="model">dashboard.item</field>
+        <field name="arch" type="xml">
+            <form string="Dashboard Item">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="dashboard_id"/>
+                            <field name="model_id"/>
+                            <field name="item_type"/>
+                            <field name="company_id"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Data">
+                            <group>
+                                <field name="measure_field_ids" widget="many2many_tags"/>
+                                <field name="secondary_measure_ids" widget="many2many_tags"/>
+                                <field name="data_aggregation"/>
+                            </group>
+                            <group string="Group By">
+                                <field name="group_by_field_id"/>
+                                <field name="sub_group_by_field_id"/>
+                                <field name="sort_field_id"/>
+                                <field name="sort_order"/>
+                                <field name="limit_enabled"/>
+                                <field name="limit_value" invisible="limit_enabled == False"/>
+                            </group>
+                            <group string="Filter">
+                                <field name="domain"/>
+                                <field name="date_field_id"/>
+                                <field name="default_date_range"/>
+                            </group>
+                        </page>
+                        <page string="Display">
+                            <group>
+                                <field name="number_format"/>
+                                <field name="color_palette"/>
+                                <field name="value_format"/>
+                                <field name="decimal_places"/>
+                                <field name="is_stacked"/>
+                                <field name="label_position"/>
+                                <field name="value_suffix"/>
+                                <field name="icon"/>
+                            </group>
+                        </page>
+                        <page string="Advanced">
+                            <group>
+                                <field name="show_legend"/>
+                                <field name="show_values_on_chart"/>
+                                <field name="use_multiplier"/>
+                                <field name="multiplier_line_ids"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+  <t t-name="dynamic_dashboard_builder.DashboardItemWizard" owl="1">
+    <div class="wizard-backdrop" t-on-click="closeWizard"/>
+
+    <div class="wizard-container">
+      <!-- HEADER -->
+      <header class="wizard-header">
+        <div class="wizard-header-left">
+          <i class="fa fa-chart-bar wizard-header-icon" aria-hidden="true"/>
+          <h2 t-if="!state.id">Create Chart</h2>
+          <h2 t-else="">Edit Chart</h2>
+        </div>
+
+        <button type="button" class="wizard-close"
+                t-on-click="closeWizard"
+                aria-label="Close">
+          <i class="fa fa-times" aria-hidden="true"/>
+        </button>
+      </header>
+
+      <!-- BODY: 2×2 grid -->
+      <div class="wizard-body">
+
+        <!-- TOP-LEFT: Preview -->
+        <section class="wizard-preview">
+          <h3>Preview</h3>
+          <div class="preview-box">[ chart preview ]</div>
+        </section>
+
+        <!-- TOP-RIGHT: Type selector -->
+        <section class="wizard-type">
+          <h3>Type</h3>
+          <div class="type-buttons">
+            <t t-foreach="typeOptions" t-as="opt" t-key="opt[0]">
+              <button
+                type="button"
+                t-att-class="opt[0] === state.itemType ? 'selected' : ''"
+                t-on-click="() => setItemType(opt[0])"
+              >
+                <i t-attf-class="fa fa-#{opt[2]} type-icon"/>
+                <span t-esc="opt[1]"/>
+              </button>
+            </t>
+          </div>
+        </section>
+
+        <!-- BOTTOM-LEFT: Tabs + panels -->
+        <section class="wizard-tabs">
+          <nav class="tab-strip">
+            <t t-foreach="tabs" t-as="tab" t-key="tab.id">
+              <button
+                type="button"
+                t-att-class="tab.id === state.activeTab ? 'active' : ''"
+                t-on-click="() => activateTab(tab.id)"
+              ><t t-esc="tab.label"/></button>
+            </t>
+          </nav>
+          <div class="tab-panels">
+            <div t-if="state.activeTab === 'data'" class="p-3">
+              <!-- Aggregation Section -->
+              <div class="mb-4 border rounded p-3">
+                <h6 class="fw-bold mb-3">Data Aggregation</h6>
+                <t t-if="state.itemType !== 'kpi' and state.selectedModelId">
+                  <div class="mb-3">
+                    <label class="form-label">Measures</label>
+                    <SelectMenu
+                      choices="state.aggregationFieldOptions"
+                      value="state.measureFieldIds"
+                      searchable="true"
+                      multiSelect="true"
+                      onSelect="onSelectMeasures"
+                    />
+                  </div>
+                </t>
+                <t t-if="state.itemType === 'bar' and state.selectedModelId">
+                  <div class="mb-3">
+                    <label class="form-label">Line Measures</label>
+                    <SelectMenu
+                      choices="state.aggregationFieldOptions"
+                      value="state.secondaryMeasureIds"
+                      searchable="true"
+                      multiSelect="true"
+                      onSelect="onSelectLineMeasures"
+                    />
+                  </div>
+                </t>
+                <div class="mb-3">
+                  <label class="form-label">Aggregation Type</label>
+                  <SelectMenu
+                    choices="dataAggregationOptions"
+                    value="state.dataAggregation"
+                    onSelect="onSelectDataAggregation"
+                  />
+                </div>
+                <t t-if="state.dataAggregation !== 'count' and state.itemType === 'kpi'">
+                  <div class="mb-2">
+                    <label class="form-label">Aggregation Field</label>
+                    <SelectMenu
+                      choices="state.aggregationFieldOptions"
+                      value="state.dataAggregationFieldId"
+                      onSelect="(value) => state.dataAggregationFieldId = value"
+                    />
+                  </div>
+                </t>
+              </div>
+              <t t-if="state.itemType !== 'kpi' and state.selectedModelId">
+                <div class="mb-4 border rounded p-3">
+                  <h6 class="fw-bold mb-3">Groups/Dimensions</h6>
+                  <div class="mb-3">
+                    <label class="form-label">Group By</label>
+                    <SelectMenu
+                      choices="state.groupByFieldOptions"
+                      value="state.groupByFieldId"
+                      searchable="true"
+                      onSelect="(value) => state.groupByFieldId = value"
+                    />
+                  </div>
+                  <t t-if="state.groupByFieldId">
+                    <div class="mb-3">
+                      <label class="form-label">Sub Group By</label>
+                      <SelectMenu
+                        choices="state.groupByFieldOptions"
+                        value="state.subGroupByFieldId"
+                        searchable="true"
+                        onSelect="(value) => state.subGroupByFieldId = value"
+                      />
+                    </div>
+                  </t>
+                  <div class="mb-3">
+                    <label class="form-label">Sort By</label>
+                    <SelectMenu
+                      choices="state.groupByFieldOptions"
+                      value="state.sortFieldId"
+                      searchable="true"
+                      onSelect="(value) => state.sortFieldId = value"
+                    />
+                    <span>**Field in sort by column must match atleast one field given in measures column.</span>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Sort Order</label>
+                    <SelectMenu
+                      choices="sortOrderOptions"
+                      value="state.sortOrder"
+                      onSelect="(value) => state.sortOrder = value"
+                    />
+                  </div>
+                  <div class="mb-3 form-check">
+                    <input type="checkbox"
+                           class="form-check-input"
+                           t-att-checked="state.limitEnabled"
+                           t-on-change="() => state.limitEnabled = !state.limitEnabled"
+                           id="limitEnabledCheckbox" />
+                    <label class="form-check-label" for="limitEnabledCheckbox">Limit Data Visibility</label>
+                  </div>
+
+                  <t t-if="state.limitEnabled">
+                    <div class="mb-3">
+                      <label class="form-label">Record Limit</label>
+                      <input type="number"
+                             class="form-control"
+                             t-att-value="state.limitValue"
+                             t-on-input="onLimitValueChange" />
+                    </div>
+                  </t>
+                </div>
+              </t>
+
+              <!-- Filter Section -->
+              <div class="mb-4 border-top pt-3 mt-4">
+                <h6 class="fw-bold mb-3">Data Filters</h6>
+
+                <!-- Domain Filter -->
+                <div class="mb-2 d-flex align-items-center">
+                  <label class="form-label me-2">Domain Filter</label>
+                  <button type="button" class="btn btn-sm btn-outline-primary" t-on-click="openDomainDialog">
+                    <i class="fa fa-filter me-1" /> Edit Filter
+                  </button>
+                </div>
+                <t t-if="state.domain">
+                  <div class="alert alert-info p-2">
+                    <strong>Current Domain:</strong>
+                    <code class="ms-1" t-esc="state.domain" />
+                  </div>
+                </t>
+
+                <!-- Date Filter Fields (Add more below as needed) -->
+                <div class="mb-2">
+                  <label class="form-label">Date Field</label>
+                  <SelectMenu
+                    choices="state.dateFieldOptions"
+                    value="state.dateFieldId"
+                    onSelect="(value) => state.dateFieldId = value"
+                  />
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Default Date Range</label>
+                  <SelectMenu
+                    choices="dateRangeOptions"
+                    value="state.defaultDateRange"
+                    onSelect="(value) => state.defaultDateRange = value"
+                  />
+                </div>
+              </div>
+            </div>
+            <div t-elif="state.activeTab==='display'" class="p-3">
+              <div class="mb-4 border rounded p-3">
+                <label class="form-label">Number System</label>
+                <SelectMenu
+                  choices="numberFormatOptions"
+                  value="state.numberFormat"
+                  onSelect="(value) => state.numberFormat = value"
+                />
+              </div>
+              <div class="mb-3 form-check">
+                <input type="checkbox"
+                       class="form-check-input"
+                       t-att-checked="state.showUnit"
+                       t-on-change="() => state.showUnit = !state.showUnit"
+                       id="showUnitCheckbox" />
+                <label class="form-check-label" for="showUnitCheckbox">Show Unit</label>
+              </div>
+              <t t-if="state.showUnit">
+                <div class="mb-3">
+                  <label class="form-label">Unit Type</label>
+                  <SelectMenu
+                    choices="unitTypeOptions"
+                    value="state.unitType"
+                    onSelect="(value) => state.unitType = value"
+                  />
+                </div>
+              </t>
+              <t t-if="state.unitType === 'custom'">
+                <div class="mb-3">
+                  <label class="form-label">Custom Unit</label>
+                  <input type="text" class="form-control" t-model="state.charUnit" />
+                </div>
+              </t>
+              <div class="mb-3">
+                <label class="form-label d-block">Theme <span class="text-info">?</span></label>
+                <div class="d-flex gap-2 align-items-center">
+                  <t t-foreach="themeColors" t-as="theme" t-key="theme.value">
+                    <div
+                      t-att-class="[
+                        'theme-option',
+                        theme.value === state.itemTheme ? 'selected' : ''
+                      ]"
+                      t-att-style="'width: 30px; height: 30px; background-color: ' + theme.color + '; border: 2px solid ' + (theme.value === state.itemTheme ? '#000' : '#ccc')"
+                      t-on-click="() => state.itemTheme = theme.value"
+                      role="button"
+                      title="Select Theme"
+                    />
+                  </t>
+                </div>
+              </div>
+
+              <!-- Custom Background Color and Transparency -->
+              <div class="mb-3">
+                <label class="form-label">Custom Background Color</label>
+                <div class="d-flex align-items-center gap-3">
+                  <input type="color" t-model="state.bgColor" class="form-control form-control-color" />
+                  <div class="d-flex align-items-center gap-2">
+                    <span>Transparency:</span>
+                    <input type="range" min="0" max="100" step="1" t-model="state.bgAlpha" style="width: 150px;" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Font Color and Transparency -->
+              <div class="mb-3">
+                <label class="form-label">Font Color</label>
+                <div class="d-flex align-items-center gap-3">
+                  <input type="color" t-model="state.fontColor" class="form-control form-control-color" />
+                  <div class="d-flex align-items-center gap-2">
+                    <span>Transparency:</span>
+                    <input type="range" min="0" max="100" step="1" t-model="state.fontAlpha" style="width: 150px;" />
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label d-block">Icon <span class="text-info">?</span></label>
+                <div class="d-flex gap-2 align-items-center mb-2">
+                  <!-- Choose Icon Button -->
+                  <button type="button" class="btn btn-outline-secondary" t-on-click="() => state.showIconModal = true">
+                    <i class="fa fa-image" />
+                  </button>
+
+                  <!-- Clear Icon Button -->
+                  <button type="button" class="btn btn-outline-secondary" t-on-click="clearIcon" title="Remove Icon">
+                    <i class="fa fa-trash" />
+                  </button>
+                </div>
+
+                <!-- Icon Preview -->
+                <t t-if="state.icon">
+                  <div class="fs-1">
+                    <i t-att-class="'fa ' + state.icon"/>
+                  </div>
+                </t>
+              </div>
+            </div>
+            <div t-elif="state.activeTab==='actions'">
+              <!-- your actions fields -->
+            </div>
+            <div t-elif="state.activeTab==='advanced'">
+              <!-- your advanced fields -->
+            </div>
+            <div t-elif="state.activeTab==='description'">
+              <label>Description</label>
+              <textarea t-model="state.description"/>
+            </div>
+          </div>
+        </section>
+
+        <!-- BOTTOM-RIGHT: Meta fields -->
+        <section class="wizard-fields">
+          <div class="field-row">
+            <label>Name *</label>
+            <input type="text" t-model="state.name"/>
+          </div>
+          <div class="field-row">
+            <label>Data Source</label>
+            <select t-model="state.dataSource">
+              <option value="odoo">Odoo</option>
+              <!-- <option value="csv">CSV File (coming soon)</option>
+              <option value="excel">Excel File (coming soon)</option> -->
+            </select>
+          </div>
+          <div class="field-row">
+            <label>Odoo Model</label>
+            <SelectMenu
+              choices="state.models"
+              value="state.selectedModelId"
+              searchable="true"
+              searchPlaceholder="'Search model...'"
+              onSelect="onModelSelect"
+            />
+          </div>
+          <div class="field-row">
+            <label>Company</label>
+            <SelectMenu
+              choices="state.companyIds"
+              value="state.companyId"
+              searchable="true"
+              searchPlaceholder="'Search Company..'"
+              onSelect="onCompanySelect"
+            />
+          </div>
+        </section>
+
+      </div>
+
+      <!-- FOOTER -->
+      <footer class="wizard-footer">
+        <button type="button" class="btn-discard" t-on-click="closeWizard">Discard</button>
+        <button type="button" class="btn-save" t-on-click="saveAndClose">Save &amp; Close</button>
+      </footer>
+    </div>
+    <t t-if="state.showIconModal">
+      <div class="modal-backdrop show"/>
+      <div class="modal d-block" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Select Icon</h5>
+              <button type="button" class="btn-close" t-on-click="() => state.showIconModal = false"/>
+            </div>
+
+            <div class="modal-body">
+              <div class="mb-3 d-flex align-items-center gap-2">
+                <input type="text" class="form-control" t-model="state.iconSearch" placeholder="Search FontAwesome Icon (e.g., bell)"/>
+                <button class="btn btn-secondary" type="button" t-on-click="onSearchIcon">Search</button>
+              </div>
+
+              <div class="d-flex flex-wrap gap-3">
+                <t t-foreach="state.displayedIcons" t-as="icon" t-key="icon">
+                  <div t-att-class="[
+                        'icon-option',
+                        icon === state.selectedIcon ? 'bg-primary text-white' : ''
+                      ]"
+                      t-on-click="() => selectIcon(icon)">
+                    <i t-att-class="'fa ' + icon" class="fs-3"/>
+                  </div>
+                </t>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </t>
+  </t>
+
+</templates>

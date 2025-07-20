@@ -1,0 +1,126 @@
+<templates xml:space="preserve">
+  <t t-name="dynamic_dashboard_builder.DashboardModal" owl="1">
+    <div class="dashboard-modal-container modal-container">
+      <div class="modal-backdrop" t-on-click="closeWizard"/>
+      <div class="modal-dialog">
+        <header class="modal-header">
+          <h3>Add New Dashboard</h3>
+          <button type="button" class="modal-close" title="Close" t-on-click="closeWizard">×</button>
+        </header>
+
+        <!-- two-column body -->
+        <div class="modal-body two-column">
+          <!-- Col 1 -->
+          <div class="modal-row">
+            <label>Dashboard Name *</label>
+            <input type="text" t-model="state.newName" placeholder="Enter name"/>
+          </div>
+
+          <!-- Col 2 -->
+          <div class="modal-row">
+            <label>Menu Name *</label>
+            <input type="text" t-model="state.newMenuName" placeholder="Enter menu name"/>
+          </div>
+
+          <!-- Col 1 -->
+          <div class="modal-row">
+            <label>Company</label>
+            <select t-model="state.newCompanyId">
+                <option t-att-value="null">— (No Company) —</option>
+              <t t-if="!state.availableCompanies.length">
+                  <option disabled="disabled">Loading companies…</option>
+              </t>
+              <t t-else="">
+                <t t-foreach="state.availableCompanies" t-as="c" t-key="c.id">
+                  <option t-att-value="c.id" t-esc="c.name"/>
+                </t>
+              </t>
+            </select>
+          </div>
+
+          <!-- Col 2 -->
+          <div class="modal-row">
+            <label>Show Under Menu *</label>
+            <select t-model="state.newParentMenuId">
+              <t t-if="!state.availableMenus.length">
+                <option disabled="disabled">Loading menus…</option>
+              </t>
+              <t t-else="">
+                <t t-foreach="state.availableMenus" t-as="m" t-key="m.id">
+                  <option t-att-value="m.id" t-esc="m.name"/>
+                </t>
+              </t>
+            </select>
+          </div>
+
+          <!-- Col 1 -->
+          <div class="modal-row">
+            <label>
+              <input type="checkbox" t-model="state.newIsPublic"/>
+              Public
+            </label>
+          </div>
+
+          <!-- Full width: multi-select -->
+          <div class="modal-row full-span">
+            <label>Visible to Groups</label>
+            <div class="group-multiselect-wrapper">
+              <!-- Input area: toggle dropdown -->
+              <div class="gm-input" t-on-click="toggleGroupDropdown">
+                <t t-if="!state.newGroupIds.length">
+                  <span class="gm-placeholder">Select groups…</span>
+                </t>
+                <t t-foreach="state.newGroupIds" t-as="gid" t-key="gid">
+                  <t t-set="group" t-value="state.availableGroups.find(g => g.id === gid)"/>
+                  <t t-if="group">
+                    <span class="gm-tag">
+                      <span t-esc="group.name"/>
+                      <i class="fa fa-times gm-tag-remove"
+                         t-on-click="ev => this.removeGroup(ev, gid)"/>
+                    </span>
+                  </t>
+                </t>
+                <i class="fa fa-caret-down gm-caret"></i>
+              </div>
+
+              <!-- Dropdown panel: stop clicks bubbling up -->
+              <div class="gm-dropdown" t-if="state.groupDropdownOpen" t-on-click="ev => ev.stopPropagation()">
+                <!-- Search box -->
+                <div class="gm-search-row">
+                  <input type="text"
+                         class="gm-search"
+                         placeholder="Search groups…"
+                         t-model="state.groupSearch"
+                         t-on-click="ev => ev.stopPropagation()"/>
+                </div>
+                <!-- Filtered list -->
+                <div class="gm-list">
+                  <t t-foreach="
+                      state.availableGroups
+                        .filter(g => !state.groupSearch
+                                    || g.name.toLowerCase()
+                                         .includes(state.groupSearch.toLowerCase())
+                        )
+                    "
+                    t-as="g"
+                    t-key="g.id">
+                    <div class="gm-item"
+                         t-att-class="{selected: state.newGroupIds.includes(g.id)}"
+                         t-on-click="() => this.toggleGroup(g.id)">
+                      <span t-esc="g.name"/>
+                    </div>
+                  </t>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <footer class="modal-footer">
+          <button type="button" class="btn btn-secondary" t-on-click="closeWizard">Cancel</button>
+          <button type="button" class="btn-save" t-on-click="createDashboard">Save Dashboard</button>
+        </footer>
+      </div>
+    </div>
+  </t>
+</templates>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+  <t t-name="dynamic_dashboard_builder.DashboardApp" owl="1">
+    <div class="dashboard-secondary">
+
+      <!-- LEFT: Dashboard Switcher + New Dashboard -->
+      <div class="group-left">
+        <select
+          t-model="state.currentDashboardId"
+          t-on-change="changeDashboard"
+          id="dashboard-switcher"
+          class="select-dashboard">
+          <t t-foreach="state.dashboards" t-as="dash" t-key="dash.id">
+            <option t-att-value="dash.id" t-esc="dash.name"/>
+          </t>
+        </select>
+        <button
+          type="button"
+          id="btn-new-dashboard"
+          class="btn-new-dashboard"
+          t-on-click="openDashboardWizard">
+          + New Dashboard
+        </button>
+      </div>
+
+      <!-- CENTER: Icon Buttons -->
+      <div class="group-center">
+        <button type="button" title="Edit Layout" class="icon-btn" id="btn-edit-layout" t-on-click="toggleEditMode">
+          <i class="fa fa-pencil"></i>
+        </button>
+        <button type="button" title="Bookmark Dashboard" class="icon-btn" id="btn-bookmark">
+          <i class="fa fa-bookmark"></i>
+        </button>
+        <button type="button" title="Take Snapshot" class="icon-btn" id="btn-snapshot">
+          <i class="fa fa-camera"></i>
+        </button>
+        <t t-if="editMode.value">
+
+          <button type="button" title="Undo" class="icon-btn" id="btn-undo" t-on-click="undo">
+            <i class="fa fa-undo"></i>
+          </button>
+          <button type="button" title="Redo" class="icon-btn" id="btn-redo" t-on-click="redo">
+            <i class="fa fa-repeat"></i>
+          </button>
+          <button title="Save Layout"
+                  class="btn btn-success btn-sm"
+                  t-on-click="saveLayout">
+            Save Layout
+          </button>
+        </t>
+        <button type="button" title="Settings" class="icon-btn" id="btn-settings">
+          <i class="fa fa-sliders"></i>
+        </button>
+        <button type="button" title="More Actions" class="icon-btn" id="btn-more">
+          <i class="fa fa-ellipsis-v"></i>
+        </button>
+      </div>
+
+      <!-- RIGHT-CENTER: Date Filter + Filters -->
+      <div class="group-right-filters">
+        <select
+          t-att-value="state.dateFilter"
+          t-on-change="evt => changeDateFilter(evt.target.value)"
+          id="select-date-filter"
+          class="select-date-filter">
+          <t t-foreach="state.dateFilterOptions" t-as="opt" t-key="opt.id">
+            <option t-att-value="opt.id" t-esc="opt.label"/>
+          </t>
+        </select>
+        <button
+          type="button"
+          id="btn-filter"
+          class="btn-filter"
+          t-on-click="openFilterMenu">
+          Filters
+        </button>
+      </div>
+
+      <!-- RIGHT: Create New Chart -->
+      <div class="group-right-action">
+        <button
+          type="button"
+          id="btn-create-chart"
+          class="btn-create-chart"
+          t-on-click="openChartWizard">
+          <i class="fa fa-plus-circle mr-1"></i>Create New Chart
+        </button>
+      </div>
+    </div>
+    <t t-if="state.modalOpen" t-call="dynamic_dashboard_builder.DashboardModal"/>
+    <main class="dashboard-canvas p-4 flex-1 overflow-auto bg-gray-50">
+    <div t-if="state.loading" class="text-center text-gray-500">Loading...</div>
+    <div t-else="" t-ref="grid" class="grid-stack">
+    <t t-foreach="state.items" t-as="item" t-key="item.id">
+      <div
+        class="grid-stack-item"
+        t-att-data-gs-id="item.id"
+        t-att-data-gs-x="item.x"
+        t-att-data-gs-y="item.y"
+        t-att-data-gs-width="item.width"
+        t-att-data-gs-height="item.height">
+        <div class="grid-stack-item-content bg-white shadow rounded">
+          <h4 t-esc="item.name"/>
+        </div>
+      </div>
+    </t>
+  </div>
+  </main>
+    <t t-if="state.showItemWizard">
+        <DashboardItemWizard
+            dashboardId="state.currentDashboardId"
+            close="closeChartWizard"
+        />
+    </t>
+  </t>
+</templates>

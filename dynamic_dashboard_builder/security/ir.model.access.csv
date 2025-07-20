@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_dashboard_dashboard,access.dashboard.dashboard,model_dashboard_dashboard,,1,1,1,1
+access_dashboard_item,access.dashboard.item,model_dashboard_item,,1,1,1,1
+access_dashboard_item_multiplier,access.dashboard.item.multiplier,model_dashboard_item_multiplier,,1,1,1,1
+access_dashboard_item_target_line,access.dashboard.item.target.line,model_dashboard_item_target_line,,1,1,1,1

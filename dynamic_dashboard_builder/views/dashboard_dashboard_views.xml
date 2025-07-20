@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_dashboard_dashboard_tree" model="ir.ui.view">
+        <field name="name">dashboard.dashboard.tree</field>
+        <field name="model">dashboard.dashboard</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="is_public"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_dashboard_dashboard_form" model="ir.ui.view">
+        <field name="name">dashboard.dashboard.form</field>
+        <field name="model">dashboard.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Dashboard">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="user_id"/>
+                        <field name="company_id"/>
+                        <field name="is_public"/>
+                        <field name="group_ids" widget="many2many_tags"/>
+                    </group>
+
+                    <!-- Smart Button for Items -->
+                    <div class="oe_button_box" name="button_box">
+                        <button type="object" name="action_view_items" icon="fa-th"
+                                class="oe_stat_button" string="Items"
+                                invisible="item_ids == False">
+                            <field name="item_ids" widget="statinfo" string="Items"/>
+                        </button>
+                    </div>
+
+                    <!-- OWL Component Mount Point -->
+                    <div class="o_dashboard_canvas" data-owl-mount="DashboardCanvas"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_dashboard_dashboard" model="ir.actions.act_window">
+        <field name="name">Dashboards</field>
+        <field name="res_model">dashboard.dashboard</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem id="menu_dashboard_root" name="Dashboards" sequence="10"/>
+    <menuitem id="menu_dashboard_dashboard" name="My Dashboards"
+              parent="menu_dashboard_root" action="action_dashboard_dashboard" sequence="1"/>
+</odoo>
